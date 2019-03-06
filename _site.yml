@@ -10,7 +10,7 @@ navbar:
     - text: "About"
       href: about.html
     - icon: fa fa-github
-      href: https://15jennlee15.github.io/FinalProject_Website/
+      href: https://github.com/15jennlee15
    # - text: What do you want it to be called
    #  href: html that you tell it to, can add html to folder and then just name it that way.
    #Can also have
