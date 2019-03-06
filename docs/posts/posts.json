@@ -1,5 +1,20 @@
 [
   {
+    "path": "posts/2019-03-06-another-practice-post/",
+    "title": "Another Practice Post",
+    "description": "This is practice for class.",
+    "author": [
+      {
+        "name": "Jenn Lewis",
+        "url": "https://15jennlee15.github.io/FinalProject_Website/"
+      }
+    ],
+    "date": "2019-03-06",
+    "categories": [],
+    "preview": {},
+    "last_modified": "2019-03-06T10:58:34-08:00"
+  },
+  {
     "path": "posts/2019-03-06-my-first-post/",
     "title": "My First Post",
     "description": "A short description of the post.",

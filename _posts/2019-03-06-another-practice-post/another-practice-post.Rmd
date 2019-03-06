@@ -1,0 +1,28 @@
+---
+title: "Another Practice Post"
+description: |
+  This is practice for class.
+author:
+  - name: Jenn Lewis
+    url: https://15jennlee15.github.io/FinalProject_Website/
+date: 03-06-2019
+output:
+  distill::distill_article:
+    self_contained: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+glimpse(mpg)
+```
+
+
+Let's Make a new graph to practice with!
+
+```{r Practice Fun}
+mpg %>%
+  ggplot(aes(year, hwy)) +
+  geom_point()
+```
+
