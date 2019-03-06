@@ -1,0 +1,29 @@
+---
+title: "My First Post"
+description: |
+  A short description of the post.
+author:
+  - name: Jenn Lewis
+    url:  https://15jennlee15.github.io/FinalProject_Website/
+date: 03-06-2019
+output:
+  distill::distill_article:
+    self_contained: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+```
+
+Here's a basic figure to practice with.
+
+```{r Practice Figure}
+mpg %>%
+  ggplot(aes(displ, cty)) +
+  geom_point(aes(color = drv)) +
+  geom_smooth() +
+  theme_minimal()
+
+```
+
