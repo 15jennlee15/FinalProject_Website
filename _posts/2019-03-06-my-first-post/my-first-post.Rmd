@@ -20,7 +20,7 @@ library(tidyverse)
 
 Here's a basic figure to practice with.
 
-```{r Practice Figure}
+```{r Practice Figure, layout ="l-screen"}
 mpg %>%
   ggplot(aes(displ, cty)) +
   geom_point(aes(color = drv)) +
