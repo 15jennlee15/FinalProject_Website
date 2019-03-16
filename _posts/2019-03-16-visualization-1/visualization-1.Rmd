@@ -1,0 +1,283 @@
+---
+title: "Visualization 1"
+description: |
+  This blog post shows the evolution of the first visual I created for this course
+author:
+  - name: Jenn Lewis
+    url: https://15jennlee15.github.io/FinalProject_Website/
+date: 03-16-2019
+output:
+  distill::distill_article:
+    self_contained: false
+    categories:
+     - Visualizations
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+#install.packages("flexdashboard")
+#install.packages("tidyverse")
+#install.packages("rio")
+#install.packages("here")
+#install.packages("rcartocolor")
+#install.packages("devtools")
+#install_github("datalorax/sundry")
+
+library(tidyverse)
+library(rio)
+library(here)
+library(rcartocolor)
+library(devtools)
+library(sundry)
+
+data1 <- import(here("data", "Full_Data.csv")) 
+```
+
+I created this visualization in RStudio using the following packages:  tidyverse, rio, sundry, here, devtools (to install sundry), and rcartocolor
+
+## About the Data
+
+These data visualizations are intended for an academic audience.
+
+The data used in these visualizations was simulated from existing data using the synthpop package. The details below describe the methods of the original data.
+
+Participants:
+Participants were 79 women (MeanAge=32.66, SD=5.22) recruited from community sources including a developmental database maintained by the psychology department, craigslist, and local mental health agencies and services. 
+
+Participants were classified as either healthy controls (n=37), women with no mental health symptoms or as women with elevated symptoms of Borderline Personality Disorder (BPD, n=42)
+
+Procedures:
+Participants were assessed in a lab where they completed tasks and self-report measures. Tasks included a baseline Heart Rate Variability measurement, a behavioral measurement of Inhibitory Control as assessed through the Stroop Color-Word task and various Self-Report measures on mental health symptoms.
+
+## First Attempt at Visual 1
+
+```{r}
+#Clean Data to proper format
+HRV1 <- data1 %>%
+  gather(key = HRV_Segment, value = RSA, RSA_1:RSA_8, na.rm =TRUE) %>%
+  select(HRV_Segment, RSA, Group) %>%
+  filter(Group != "NA") %>%
+  group_by(Group, HRV_Segment) %>%
+  summarise(RSA_mean = mean(RSA),
+            se_RSA = se(RSA))
+
+
+HRV1 %>%
+  ggplot(aes(HRV_Segment, RSA_mean, color = Group)) +
+  geom_line() +
+  theme_minimal() +
+  labs(y = "HRV",
+       x = "Segment",
+       title = "HRV across Time for BPD vs Control Group")
+```
+
+I first had to wrangle the data by gathering the data, selecting the variables of interest and creating mean and standard error variables. 
+
+HRV1 <- data1 %>%
+
+gather(key = HRV_Segment, value = RSA, RSA_1:RSA_8, na.rm =TRUE) %>%
+  
+  select(HRV_Segment, RSA, Group) %>%
+  
+  filter(Group != "NA") %>%
+  
+  group_by(Group, HRV_Segment) %>%
+  
+  summarise(RSA_mean = mean(RSA),
+            
+            se_RSA = se(RSA))
+
+Next I made my first attempt to visualize the data using a line graph.
+
+HRV1 %>%
+
+  ggplot(aes(HRV_Segment, RSA_mean, color = Group)) +
+  
+  geom_line() +
+  
+  theme_minimal() +
+  
+  labs(y = "HRV",
+       
+       x = "Segment",
+       
+       title = "HRV across Time for BPD vs Control Group")
+       
+In this first attempt, I quickly realized that Group needed to be recoded as a factor. I also noticed that the labels for the X Axis are redundent and would be better as numbers only.  So in my next iteration, I will remove the "RSA_" from my axis labels and I will recode Group as a factor. 
+
+## Second Attempt at Visual 1
+
+```{r}
+HRV1$Group <- as.factor(HRV1$Group)
+
+HRV1 <- HRV1 %>%
+mutate(HRV_Segment = recode(HRV_Segment,
+                              "RSA_1" = "1",
+                              "RSA_2" = "2",
+                              "RSA_3" = "3",
+                              "RSA_4" = "4",
+                              "RSA_5" = "5",
+                              "RSA_6" = "6",
+                              "RSA_7" = "7",
+                              "RSA_8" = "8"))
+HRV1 %>%
+  ggplot(aes(HRV_Segment, RSA_mean, color = Group)) +
+  geom_line() +
+  theme_minimal() +
+  labs(y = "HRV",
+       x = "Segment",
+       title = "HRV across Time for BPD vs Control Group")
+```
+
+I converted Group to a factor:
+
+HRV1$Group <- as.factor(HRV1$Group)
+
+I also recoded the labels of HRV Segment:
+
+HRV1 <- HRV1 %>%
+
+mutate(HRV_Segment = recode(HRV_Segment,
+                              
+                              "RSA_1" = "1",
+                              
+                              "RSA_2" = "2",
+                              
+                              "RSA_3" = "3",
+                              
+                              "RSA_4" = "4",
+                              
+                              "RSA_5" = "5",
+                              
+                              "RSA_6" = "6",
+                              
+                              "RSA_7" = "7",
+                              
+                              "RSA_8" = "8"))
+
+I then replotted the visual:
+
+HRV1 %>%
+  
+  ggplot(aes(HRV_Segment, RSA_mean, color = Group)) +
+  
+  geom_line() +
+  
+  theme_minimal() +
+  
+  labs(y = "HRV",
+  
+       x = "Segment",
+  
+       title = "HRV across Time for BPD vs Control Group")
+       
+After making these changes I saw improvements, but there was also another obvious problem that popped up - no data showing.  I sought out some help for this and discovered that I was mapping things in the aesthetics wrong.  I needed to define "group" rather than color is the main plot aesthetic and define color in the geom.
+
+## Third Attempt at Visual 1
+
+```{r}
+HRV1 %>%
+  ggplot(aes(HRV_Segment, RSA_mean, group = Group)) +
+  geom_line(aes(color = Group)) +
+  theme_minimal() +
+  labs(y = "HRV",
+       x = "Segment",
+       title = "HRV across Time for BPD vs Control Group")
+```
+
+I added color = Group to the geom_line aesthetic to fix the problem from the earlier version and Wahoo! Data has appeared.  
+
+HRV1 %>%
+  
+  ggplot(aes(HRV_Segment, RSA_mean, group = Group)) +
+  
+  geom_line(aes(color = Group)) +
+  
+  theme_minimal() +
+  
+  labs(y = "HRV",
+  
+       x = "Segment",
+  
+       title = "HRV across Time for BPD vs Control Group")
+
+At this point I feel like the visual is fairly successful, but can use some little tweaks to the design.  In my next batch of edits, I'll be defining the groups more clearly and adding some style changes.
+
+## Final Versions of Visual 1
+
+```{r}
+HRV1$Group <- recode(HRV1$Group, '1' = "Control Group", '2' = "BPD Group")
+
+plot1 <- HRV1 %>%
+  ggplot(aes(HRV_Segment, RSA_mean, group = Group)) +
+  geom_ribbon(aes(ymin = RSA_mean - 1.96*se_RSA, 
+                  ymax = RSA_mean + 1.96*se_RSA), 
+                  alpha = 0.2) +
+  geom_line(aes(color = Group), 
+            size = 0.9) +
+  theme_minimal() +
+  scale_color_carto_d(palette = "Burg") +
+  ylim(1,8) +
+  labs(y = "HRV",
+       x = "Segment (30 sec epochs)",
+       title = "Heart Rate Variability Across Time for Women with Borderline 
+Personality Disorder vs A Control Group")  
+
+plot1 + theme(plot.title = element_text(size = 12, hjust = 0.5))
+```
+
+For my final edits, I improved a lot of basic visual aspects of the plot - line width, color, text size, title centering etc. I also incorporated edits from my peer review which suggested showing some uncertainty. 
+
+HRV1$Group <- recode(HRV1$Group, '1' = "Control Group", '2' = "BPD Group")
+
+plot1 <- HRV1 %>%
+  
+  ggplot(aes(HRV_Segment, RSA_mean, group = Group)) +
+  
+  geom_ribbon(aes(ymin = RSA_mean - 1.96*se_RSA, 
+  
+                  ymax = RSA_mean + 1.96*se_RSA), 
+  
+                  alpha = 0.2) +
+  
+  geom_line(aes(color = Group), 
+  
+            size = 0.9) +
+  
+  theme_minimal() +
+  
+  scale_color_carto_d(palette = "Burg") +
+  
+  ylim(1,8) +
+  
+  labs(y = "HRV",
+  
+       x = "Segment (30 sec epochs)",
+  
+       title = "Heart Rate Variability Across Time for Women with Borderline 
+
+Personality Disorder vs A Control Group")  
+
+plot1 + theme(plot.title = element_text(size = 12, hjust = 0.5))
+
+```{r}
+plot1.5 <- HRV1 %>%
+  ggplot(aes(HRV_Segment, RSA_mean, group = Group)) +
+  geom_ribbon(aes(ymin = RSA_mean - 1.96*se_RSA, 
+                  ymax = RSA_mean + 1.96*se_RSA), 
+                  alpha = 0.3) +
+  geom_line(aes(color = Group), 
+            size = 0.9) +
+  theme_minimal() +
+  scale_color_carto_d(palette = "Burg") +
+  ylim(5.5,7.5) +
+  labs(y = "HRV",
+       x = "Segment (30 sec epochs)",
+       title = "Heart Rate Variability Across Time for Women with Borderline 
+Personality Disorder vs A Control Group")  
+
+plot1.5 + theme(plot.title = element_text(size = 12, hjust = 0.5))
+```
+
+I created a second version of the final visual - the first shows the full range of the y-axis and the second is a zoomed in version that looks at a more limited range. I did this by adding "ylim(5.5,7.5)" to the code. In the first graph you'll notice there is a lot of white space because there are no data points in the lower range, which is not visually appealing.  The benefit of this however, is that it more accurately shows the scale of the axis and doesn't exaggerate differences between groups. The zoomed in version allows you to see more of the varaition between the groups which may or may not be significantly different from each other.

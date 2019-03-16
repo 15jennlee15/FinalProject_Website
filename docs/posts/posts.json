@@ -1,5 +1,20 @@
 [
   {
+    "path": "posts/2019-03-16-visualization-1/",
+    "title": "Visualization 1",
+    "description": "This blog post shows the evolution of the first visual I created for this course",
+    "author": [
+      {
+        "name": "Jenn Lewis",
+        "url": "https://15jennlee15.github.io/FinalProject_Website/"
+      }
+    ],
+    "date": "2019-03-16",
+    "categories": [],
+    "preview": "posts/2019-03-16-visualization-1/visualization-1_files/figure-html5/unnamed-chunk-1-1.png",
+    "last_modified": "2019-03-16T13:41:20-07:00"
+  },
+  {
     "path": "posts/2019-03-06-another-practice-post/",
     "title": "Another Practice Post",
     "description": "This is practice for class.",
