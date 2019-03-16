@@ -1,0 +1,88 @@
+---
+title: "Visualization 3"
+description: |
+  This blog post shows the evolution of the third visual I created for this course
+author:
+  - name: Jenn Lewis
+    url: https://15jennlee15.github.io/FinalProject_Website/
+date: 03-16-2019
+output:
+  distill::distill_article:
+    self_contained: false
+categories:
+     - Visualizations
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+#install.packages("flexdashboard")
+#install.packages("tidyverse")
+#install.packages("rio")
+#install.packages("here")
+#install.packages("rcartocolor")
+#install.packages("devtools")
+#install_github("datalorax/sundry")
+
+library(tidyverse)
+library(rio)
+library(here)
+library(rcartocolor)
+library(devtools)
+library(sundry)
+
+data1 <- import(here("data", "Full_Data.csv")) 
+
+data1$Group <- as.factor(data1$Group)
+data1$Group <- recode(data1$Group, '1' = "Control Group", '2' = "BPD Group")
+
+```
+
+
+I created this visualization in RStudio using the following packages:  tidyverse, rio, sundry, here, devtools (to install sundry), and rcartocolor
+
+## About the Data
+
+See blog post "Visualization 1" for a description of the data!
+
+## First Attempt at Visual 3
+
+My initial attempt to make a scatterplot showing the relationship between a self-reported measure of emotion regulations (DERS) and inhibitory control as measured by the Stroop for both a BPD sample and healthy control sample.
+
+```{r}
+data1 %>%
+  ggplot(aes(DERS, ColorWord_Score, color = Group)) +
+  geom_point() +
+  scale_colour_viridis_d() +
+  geom_smooth(method = "lm") +
+  theme_minimal() +
+  labs(title = "The Relationship Between Emotion Regulation and Inhibitory Control",
+       x = "Emotion Regulation Score (DERS)",
+       y = "Inhibitory Control (Stroop Score)")
+```
+
+ As I examine this visual, I notice the outlier in the bottom corner, I also believe I can adjust some of the styling.  The colors specifically the yellow may be hard to see.
+ 
+## Final Version of Visual 3
+
+In this final version, I adjusted the colors to stand out more.  I also took some of the suggestions from my peer review and removed the outlier, and added a caption explaining what High DERS represents. I also made some stylistic changes.
+
+This graph visualizes the relationship between inhibitory control and emotion regulation in women with and without BPD.  
+
+```{r}
+plot3 <- data1 %>%
+  filter(Group != "NA" & ColorWord_Score > 20) %>%
+  ggplot(aes(DERS, ColorWord_Score, color = Group)) +
+  geom_point(alpha = 0.7) +
+  scale_colour_carto_d() +
+  geom_smooth(method = "lm", alpha = 0.2) +
+  theme_minimal() +
+  labs(title = "The Relationship Between Emotion Regulation and Inhibitory Control",
+       x = "Emotion Regulation Score (DERS)",
+       y = "Inhibitory Control (Stroop Score)",
+       caption = "*Higher scores on the DERS represents more Emotion Regulation Difficulties")
+
+plot3 + theme(plot.title = element_text(size = 12, hjust = 0.5))
+```
+
+

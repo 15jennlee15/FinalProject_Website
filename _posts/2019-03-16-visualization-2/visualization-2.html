@@ -963,7 +963,7 @@
 </div>
 
 <div class="d-article">
-<p>I created this visualization in RStudio using the following packages: tidyverse, rio, sundry, here, devtools (to install sundry), and rcartocolor</p>
+<p>I created this visualization in RStudio using the following packages: tidyverse, rio, sundry, here, and devtools (to install sundry).</p>
 <h2 id="about-the-data">About the Data</h2>
 <p>See blog post “Visualization 1” for a description of the data!</p>
 <h2 id="first-attempt-at-visual-2">First Attempt at Visual 2</h2>
@@ -1025,15 +1025,27 @@ plot2 + theme(plot.title = element_text(size = 12, hjust = 0.5),
 <p>In this final version I added error bars to visualize uncertainty. This seems effective however one of my error bars is not showing up and I can see that is because one of the standard erros is “NA”. Not sure what created this or how to fix it at this point.</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
-data1 %&gt;%
-  ggplot(aes(DERS, ColorWord_Score, color = Group)) +
-  geom_point() +
-  scale_colour_viridis_d() +
-  geom_smooth(method = &quot;lm&quot;) +
+plot2 &lt;- Symptoms %&gt;%
+  ggplot(aes(Symptom, Score_mean, fill = Group)) +
+  geom_col(position = &quot;dodge&quot;, 
+           alpha = 0.8) +
+  geom_errorbar(aes(ymin = Score_mean - 1.96*Score_se,
+                    ymax = Score_mean + 1.96*Score_se),
+                color = &quot;gray40&quot;,
+                position = position_dodge(.9)) +
+  scale_fill_viridis_d() +
   theme_minimal() +
-  labs(title = &quot;The Relationship Between Emotion Regulation and Inhibitory Control&quot;,
-       x = &quot;Emotion Regulation Score (DERS)&quot;,
-       y = &quot;Inhibitory Control (Stroop Score)&quot;)</code></pre>
+  labs(title = &quot;Mental Health Profiles of Clinical and Non-Clinical Samples&quot;,
+       x = &quot;Symptom&quot;,
+       y = &quot;Score (standardized)&quot;) +
+  geom_hline(aes(yintercept = 0),
+             color = &quot;black&quot;,
+             size = 0.4,
+             lty = &quot;dashed&quot;)
+
+
+plot2 + theme(plot.title = element_text(size = 12, hjust = 0.5),
+              panel.background = element_rect(fill = &quot;gray80&quot;))</code></pre>
 <p><img src="visualization-2_files/figure-html5/unnamed-chunk-3-1.png" width="624" /></p>
 </div>
 <!--radix_placeholder_article_footer-->

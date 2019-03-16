@@ -29,7 +29,24 @@
       "Visualizations"
     ],
     "preview": "posts/2019-03-16-visualization-2/visualization-2_files/figure-html5/unnamed-chunk-1-1.png",
-    "last_modified": "2019-03-16T13:57:05-07:00"
+    "last_modified": "2019-03-16T14:03:23-07:00"
+  },
+  {
+    "path": "posts/2019-03-16-visualization-3/",
+    "title": "Visualization 3",
+    "description": "This blog post shows the evolution of the third visual I created for this course",
+    "author": [
+      {
+        "name": "Jenn Lewis",
+        "url": "https://15jennlee15.github.io/FinalProject_Website/"
+      }
+    ],
+    "date": "2019-03-16",
+    "categories": [
+      "Visualizations"
+    ],
+    "preview": "posts/2019-03-16-visualization-3/visualization-3_files/figure-html5/unnamed-chunk-1-1.png",
+    "last_modified": "2019-03-16T14:07:05-07:00"
   },
   {
     "path": "posts/2019-03-06-another-practice-post/",

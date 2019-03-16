@@ -20,14 +20,12 @@ knitr::opts_chunk$set(echo = FALSE)
 #install.packages("tidyverse")
 #install.packages("rio")
 #install.packages("here")
-#install.packages("rcartocolor")
 #install.packages("devtools")
 #install_github("datalorax/sundry")
 
 library(tidyverse)
 library(rio)
 library(here)
-library(rcartocolor)
 library(devtools)
 library(sundry)
 
@@ -35,7 +33,7 @@ data1 <- import(here("data", "Full_Data.csv"))
 
 ```
 
-I created this visualization in RStudio using the following packages:  tidyverse, rio, sundry, here, devtools (to install sundry), and rcartocolor
+I created this visualization in RStudio using the following packages:  tidyverse, rio, sundry, here, and devtools (to install sundry).
 
 ## About the Data
 
@@ -110,14 +108,26 @@ plot2 + theme(plot.title = element_text(size = 12, hjust = 0.5),
 In this final version I added error bars to visualize uncertainty.  This seems effective however one of my error bars is not showing up and I can see that is because one of the standard erros is "NA".  Not sure what created this or how to fix it at this point.
 
 ```{r, echo=TRUE}
-data1 %>%
-  ggplot(aes(DERS, ColorWord_Score, color = Group)) +
-  geom_point() +
-  scale_colour_viridis_d() +
-  geom_smooth(method = "lm") +
+plot2 <- Symptoms %>%
+  ggplot(aes(Symptom, Score_mean, fill = Group)) +
+  geom_col(position = "dodge", 
+           alpha = 0.8) +
+  geom_errorbar(aes(ymin = Score_mean - 1.96*Score_se,
+                    ymax = Score_mean + 1.96*Score_se),
+                color = "gray40",
+                position = position_dodge(.9)) +
+  scale_fill_viridis_d() +
   theme_minimal() +
-  labs(title = "The Relationship Between Emotion Regulation and Inhibitory Control",
-       x = "Emotion Regulation Score (DERS)",
-       y = "Inhibitory Control (Stroop Score)")
+  labs(title = "Mental Health Profiles of Clinical and Non-Clinical Samples",
+       x = "Symptom",
+       y = "Score (standardized)") +
+  geom_hline(aes(yintercept = 0),
+             color = "black",
+             size = 0.4,
+             lty = "dashed")
+
+
+plot2 + theme(plot.title = element_text(size = 12, hjust = 0.5),
+              panel.background = element_rect(fill = "gray80"))
 ```
 
