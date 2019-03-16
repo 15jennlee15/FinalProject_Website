@@ -1,0 +1,123 @@
+---
+title: "Visualization 2"
+description: |
+  This blog post shows the evolution of the second visual I created for this course
+author:
+  - name: Jenn Lewis
+    url: https://15jennlee15.github.io/FinalProject_Website/
+date: 03-16-2019
+output:
+  distill::distill_article:
+    self_contained: false
+categories:
+     - Visualizations
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+#install.packages("flexdashboard")
+#install.packages("tidyverse")
+#install.packages("rio")
+#install.packages("here")
+#install.packages("rcartocolor")
+#install.packages("devtools")
+#install_github("datalorax/sundry")
+
+library(tidyverse)
+library(rio)
+library(here)
+library(rcartocolor)
+library(devtools)
+library(sundry)
+
+data1 <- import(here("data", "Full_Data.csv")) 
+
+```
+
+I created this visualization in RStudio using the following packages:  tidyverse, rio, sundry, here, devtools (to install sundry), and rcartocolor
+
+## About the Data
+
+See blog post "Visualization 1" for a description of the data!
+
+## First Attempt at Visual 2
+
+You can see from my code below that the first steps in this visualization was tidying the data a bit, including making changes to variable names to be more descriptive. I recoded "Group" as a factor and recoded the factor levels to be more meaningful. I also had to creat the scaled scores of the symptoms measures used in this visual. Next the data required gathering, grouping and summarizing to achieve the data set necessary to create our desired visual.
+
+```{r, echo=TRUE}
+data1$Group <- as.factor(data1$Group)
+data1$Group <- recode(data1$Group, '1' = "Control Group", '2' = "BPD Group")
+
+data1 <- data1 %>%
+  mutate(HAMA_C = scale(HAMA, center = TRUE, scale = TRUE),
+         PHQ_C = scale(PHQ, center = TRUE, scale = TRUE),
+         DERS_C = scale(DERS, center = TRUE, scale = TRUE))
+
+#cleaning data
+Symptoms <- data1 %>%
+  gather(key = Symptom, value = Score, HAMA_C, PHQ_C, DERS_C, na.rm = TRUE) %>%
+  mutate(Symptom = recode(Symptom, 
+                           "HAMA_C" = "Anxiety",
+                           "PHQ_C" = "Depression",
+                           "DERS_C" = "Emotion Dysregulation")) %>%
+  group_by(Group, Symptom) %>%
+  summarise(Score_mean = mean(Score), Score_se = se(Score)) %>%
+  filter(Group != "NA")
+
+Symptoms %>%
+  ggplot(aes(Symptom, Score_mean, fill = Group)) +
+  geom_col(position = "dodge") +
+  theme_minimal() +
+  labs(title = "Mental Health Profiles of Clinical and Non-Clinical Samples",
+       x = "Symptom",
+       y = "Score (standardized)")
+
+
+
+```
+
+This was my first attempt at this visual. A pretty decent start. I recognized the need for effective labelling and went ahead and did that right away so that the axes labels, factors, and group are all easily determinable. While I think this is a good first attempt, I wanted to improve some of the aesthetics and I worked on that in my next iteration.
+
+## Second Attempt at Visual 2
+
+For this version, I worked on improving some visual aesthetics - changing the color scale, adjusting transparency, centering the title, and changing the panel background.  Also at the recommendation of one of peer reviews I created a line at the mean to highlight that more clearly in the plot.
+
+```{r, echo=TRUE}
+
+plot2 <- Symptoms %>%
+  ggplot(aes(Symptom, Score_mean, fill = Group)) +
+  geom_col(position = "dodge", alpha = 0.8) +
+  scale_fill_viridis_d() +
+  theme_minimal() +
+  labs(title = "Mental Health Profiles of Clinical and Non-Clinical Samples",
+       x = "Symptom",
+       y = "Score (standardized)") +
+  geom_hline(aes(yintercept = 0),
+             color = "black",
+             size = 0.4,
+             lty = "dashed")
+
+
+plot2 + theme(plot.title = element_text(size = 12, hjust = 0.5),
+              panel.background = element_rect(fill = "gray80"))
+
+
+```
+
+## Final Version of Visual 2
+
+In this final version I added error bars to visualize uncertainty.  This seems effective however one of my error bars is not showing up and I can see that is because one of the standard erros is "NA".  Not sure what created this or how to fix it at this point.
+
+```{r, echo=TRUE}
+data1 %>%
+  ggplot(aes(DERS, ColorWord_Score, color = Group)) +
+  geom_point() +
+  scale_colour_viridis_d() +
+  geom_smooth(method = "lm") +
+  theme_minimal() +
+  labs(title = "The Relationship Between Emotion Regulation and Inhibitory Control",
+       x = "Emotion Regulation Score (DERS)",
+       y = "Inhibitory Control (Stroop Score)")
+```
+

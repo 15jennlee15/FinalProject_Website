@@ -971,112 +971,117 @@
 <p>Participants were classified as either healthy controls (n=37), women with no mental health symptoms or as women with elevated symptoms of Borderline Personality Disorder (BPD, n=42)</p>
 <p>Procedures: Participants were assessed in a lab where they completed tasks and self-report measures. Tasks included a baseline Heart Rate Variability measurement, a behavioral measurement of Inhibitory Control as assessed through the Stroop Color-Word task and various Self-Report measures on mental health symptoms.</p>
 <h2 id="first-attempt-at-visual-1">First Attempt at Visual 1</h2>
+<p>I first had to wrangle the data by gathering the data, selecting the variables of interest and creating mean and standard error variables.</p>
+<p>Next I made my first attempt to visualize the data using a line graph.</p>
 <div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+#Clean Data to proper format
+HRV1 &lt;- data1 %&gt;%
+  gather(key = HRV_Segment, value = RSA, RSA_1:RSA_8, na.rm =TRUE) %&gt;%
+  select(HRV_Segment, RSA, Group) %&gt;%
+  filter(Group != &quot;NA&quot;) %&gt;%
+  group_by(Group, HRV_Segment) %&gt;%
+  summarise(RSA_mean = mean(RSA),
+            se_RSA = se(RSA))
+
+
+HRV1 %&gt;%
+  ggplot(aes(HRV_Segment, RSA_mean, color = Group)) +
+  geom_line() +
+  theme_minimal() +
+  labs(y = &quot;HRV&quot;,
+       x = &quot;Segment&quot;,
+       title = &quot;HRV across Time for BPD vs Control Group&quot;)</code></pre>
 <p><img src="visualization-1_files/figure-html5/unnamed-chunk-1-1.png" width="624" /></p>
 </div>
-<p>I first had to wrangle the data by gathering the data, selecting the variables of interest and creating mean and standard error variables.</p>
-<p>HRV1 &lt;- data1 %&gt;%</p>
-<p>gather(key = HRV_Segment, value = RSA, RSA_1:RSA_8, na.rm =TRUE) %&gt;%</p>
-<p>select(HRV_Segment, RSA, Group) %&gt;%</p>
-<p>filter(Group != “NA”) %&gt;%</p>
-<p>group_by(Group, HRV_Segment) %&gt;%</p>
-<p>summarise(RSA_mean = mean(RSA),</p>
-<pre><code>
-        se_RSA = se(RSA))</code></pre>
-<p>Next I made my first attempt to visualize the data using a line graph.</p>
-<p>HRV1 %&gt;%</p>
-<p>ggplot(aes(HRV_Segment, RSA_mean, color = Group)) +</p>
-<p>geom_line() +</p>
-<p>theme_minimal() +</p>
-<p>labs(y = “HRV”,</p>
-<pre><code>
-   x = &quot;Segment&quot;,
-   
-   title = &quot;HRV across Time for BPD vs Control Group&quot;)
-   </code></pre>
 <p>In this first attempt, I quickly realized that Group needed to be recoded as a factor. I also noticed that the labels for the X Axis are redundent and would be better as numbers only. So in my next iteration, I will remove the “RSA_” from my axis labels and I will recode Group as a factor.</p>
 <h2 id="second-attempt-at-visual-1">Second Attempt at Visual 1</h2>
+<p>I converted Group to a factor. I also recoded the labels of HRV Segment. I then replotted the visual:</p>
 <div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+HRV1$Group &lt;- as.factor(HRV1$Group)
+
+HRV1 &lt;- HRV1 %&gt;%
+mutate(HRV_Segment = recode(HRV_Segment,
+                              &quot;RSA_1&quot; = &quot;1&quot;,
+                              &quot;RSA_2&quot; = &quot;2&quot;,
+                              &quot;RSA_3&quot; = &quot;3&quot;,
+                              &quot;RSA_4&quot; = &quot;4&quot;,
+                              &quot;RSA_5&quot; = &quot;5&quot;,
+                              &quot;RSA_6&quot; = &quot;6&quot;,
+                              &quot;RSA_7&quot; = &quot;7&quot;,
+                              &quot;RSA_8&quot; = &quot;8&quot;))
+HRV1 %&gt;%
+  ggplot(aes(HRV_Segment, RSA_mean, color = Group)) +
+  geom_line() +
+  theme_minimal() +
+  labs(y = &quot;HRV&quot;,
+       x = &quot;Segment&quot;,
+       title = &quot;HRV across Time for BPD vs Control Group&quot;)</code></pre>
 <p><img src="visualization-1_files/figure-html5/unnamed-chunk-2-1.png" width="624" /></p>
 </div>
-<p>I converted Group to a factor:</p>
-<p>HRV1<span class="math inline">\(Group &lt;- as.factor(HRV1\)</span>Group)</p>
-<p>I also recoded the labels of HRV Segment:</p>
-<p>HRV1 &lt;- HRV1 %&gt;%</p>
-<p>mutate(HRV_Segment = recode(HRV_Segment,</p>
-<pre><code>
-                          &quot;RSA_1&quot; = &quot;1&quot;,
-                          
-                          &quot;RSA_2&quot; = &quot;2&quot;,
-                          
-                          &quot;RSA_3&quot; = &quot;3&quot;,
-                          
-                          &quot;RSA_4&quot; = &quot;4&quot;,
-                          
-                          &quot;RSA_5&quot; = &quot;5&quot;,
-                          
-                          &quot;RSA_6&quot; = &quot;6&quot;,
-                          
-                          &quot;RSA_7&quot; = &quot;7&quot;,
-                          
-                          &quot;RSA_8&quot; = &quot;8&quot;))</code></pre>
-<p>I then replotted the visual:</p>
-<p>HRV1 %&gt;%</p>
-<p>ggplot(aes(HRV_Segment, RSA_mean, color = Group)) +</p>
-<p>geom_line() +</p>
-<p>theme_minimal() +</p>
-<p>labs(y = “HRV”,</p>
-<pre><code>
-   x = &quot;Segment&quot;,
-
-   title = &quot;HRV across Time for BPD vs Control Group&quot;)
-   </code></pre>
 <p>After making these changes I saw improvements, but there was also another obvious problem that popped up - no data showing. I sought out some help for this and discovered that I was mapping things in the aesthetics wrong. I needed to define “group” rather than color is the main plot aesthetic and define color in the geom.</p>
 <h2 id="third-attempt-at-visual-1">Third Attempt at Visual 1</h2>
+<p>I added color = Group to the geom_line aesthetic to fix the problem from the earlier version and Wahoo! Data has appeared.</p>
 <div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+HRV1 %&gt;%
+  ggplot(aes(HRV_Segment, RSA_mean, group = Group)) +
+  geom_line(aes(color = Group)) +
+  theme_minimal() +
+  labs(y = &quot;HRV&quot;,
+       x = &quot;Segment&quot;,
+       title = &quot;HRV across Time for BPD vs Control Group&quot;)</code></pre>
 <p><img src="visualization-1_files/figure-html5/unnamed-chunk-3-1.png" width="624" /></p>
 </div>
-<p>I added color = Group to the geom_line aesthetic to fix the problem from the earlier version and Wahoo! Data has appeared.</p>
-<p>HRV1 %&gt;%</p>
-<p>ggplot(aes(HRV_Segment, RSA_mean, group = Group)) +</p>
-<p>geom_line(aes(color = Group)) +</p>
-<p>theme_minimal() +</p>
-<p>labs(y = “HRV”,</p>
-<pre><code>
-   x = &quot;Segment&quot;,
-
-   title = &quot;HRV across Time for BPD vs Control Group&quot;)</code></pre>
 <p>At this point I feel like the visual is fairly successful, but can use some little tweaks to the design. In my next batch of edits, I’ll be defining the groups more clearly and adding some style changes.</p>
 <h2 id="final-versions-of-visual-1">Final Versions of Visual 1</h2>
 <div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+HRV1$Group &lt;- recode(HRV1$Group, &#39;1&#39; = &quot;Control Group&quot;, &#39;2&#39; = &quot;BPD Group&quot;)
+
+plot1 &lt;- HRV1 %&gt;%
+  ggplot(aes(HRV_Segment, RSA_mean, group = Group)) +
+  geom_ribbon(aes(ymin = RSA_mean - 1.96*se_RSA, 
+                  ymax = RSA_mean + 1.96*se_RSA), 
+                  alpha = 0.2) +
+  geom_line(aes(color = Group), 
+            size = 0.9) +
+  theme_minimal() +
+  scale_color_carto_d(palette = &quot;Burg&quot;) +
+  ylim(1,8) +
+  labs(y = &quot;HRV&quot;,
+       x = &quot;Segment (30 sec epochs)&quot;,
+       title = &quot;Heart Rate Variability Across Time for Women with Borderline 
+Personality Disorder vs A Control Group&quot;)  
+
+plot1 + theme(plot.title = element_text(size = 12, hjust = 0.5))</code></pre>
 <p><img src="visualization-1_files/figure-html5/unnamed-chunk-4-1.png" width="624" /></p>
 </div>
 <p>For my final edits, I improved a lot of basic visual aspects of the plot - line width, color, text size, title centering etc. I also incorporated edits from my peer review which suggested showing some uncertainty.</p>
-<p>HRV1<span class="math inline">\(Group &lt;- recode(HRV1\)</span>Group, ‘1’ = “Control Group”, ‘2’ = “BPD Group”)</p>
-<p>plot1 &lt;- HRV1 %&gt;%</p>
-<p>ggplot(aes(HRV_Segment, RSA_mean, group = Group)) +</p>
-<p>geom_ribbon(aes(ymin = RSA_mean - 1.96*se_RSA,</p>
-<pre><code>
-              ymax = RSA_mean + 1.96*se_RSA), 
-
-              alpha = 0.2) +</code></pre>
-<p>geom_line(aes(color = Group),</p>
-<pre><code>
-        size = 0.9) +</code></pre>
-<p>theme_minimal() +</p>
-<p>scale_color_carto_d(palette = “Burg”) +</p>
-<p>ylim(1,8) +</p>
-<p>labs(y = “HRV”,</p>
-<pre><code>
-   x = &quot;Segment (30 sec epochs)&quot;,
-
-   title = &quot;Heart Rate Variability Across Time for Women with Borderline </code></pre>
-<p>Personality Disorder vs A Control Group&quot;)</p>
-<p>plot1 + theme(plot.title = element_text(size = 12, hjust = 0.5))</p>
+<p>I created a second version of the final visual - the first shows the full range of the y-axis and the second is a zoomed in version that looks at a more limited range. I did this by adding “ylim(5.5,7.5)” to the code.</p>
 <div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+plot1.5 &lt;- HRV1 %&gt;%
+  ggplot(aes(HRV_Segment, RSA_mean, group = Group)) +
+  geom_ribbon(aes(ymin = RSA_mean - 1.96*se_RSA, 
+                  ymax = RSA_mean + 1.96*se_RSA), 
+                  alpha = 0.3) +
+  geom_line(aes(color = Group), 
+            size = 0.9) +
+  theme_minimal() +
+  scale_color_carto_d(palette = &quot;Burg&quot;) +
+  ylim(5.5,7.5) +
+  labs(y = &quot;HRV&quot;,
+       x = &quot;Segment (30 sec epochs)&quot;,
+       title = &quot;Heart Rate Variability Across Time for Women with Borderline 
+Personality Disorder vs A Control Group&quot;)  
+
+plot1.5 + theme(plot.title = element_text(size = 12, hjust = 0.5))</code></pre>
 <p><img src="visualization-1_files/figure-html5/unnamed-chunk-5-1.png" width="624" /></p>
 </div>
-<p>I created a second version of the final visual - the first shows the full range of the y-axis and the second is a zoomed in version that looks at a more limited range. I did this by adding “ylim(5.5,7.5)” to the code. In the first graph you’ll notice there is a lot of white space because there are no data points in the lower range, which is not visually appealing. The benefit of this however, is that it more accurately shows the scale of the axis and doesn’t exaggerate differences between groups. The zoomed in version allows you to see more of the varaition between the groups which may or may not be significantly different from each other.</p>
+<p>In the first graph you’ll notice there is a lot of white space because there are no data points in the lower range, which is not visually appealing. The benefit of this however, is that it more accurately shows the scale of the axis and doesn’t exaggerate differences between groups.</p>
+<p>In this second version of the finalized plot, I’ve limited the y-axis to show only a select range. This allows you to see the group differences more clearly. A disadvantage to this, is that it may exxagerate differences, making things appear significantly different even though they are actually quite close. Because this data is visualizing HRV however, it makes sense to limit the range as there are physiological limitations to how the scale extends (only dead people would have an HRV at 0). Also differences in HRv can be small but quite meaninful at times.</p>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->
 </div>
@@ -1084,15 +1089,6 @@
 <div class="d-appendix">
 </div>
 
-<!-- dynamically load mathjax for compatibility with self-contained -->
-<script>
-  (function () {
-    var script = document.createElement("script");
-    script.type = "text/javascript";
-    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
-    document.getElementsByTagName("head")[0].appendChild(script);
-  })();
-</script>
 
 <!--radix_placeholder_site_after_body-->
 <!--/radix_placeholder_site_after_body-->
